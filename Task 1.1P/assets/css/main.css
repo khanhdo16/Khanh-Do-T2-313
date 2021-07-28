@@ -1,0 +1,56 @@
+body {
+    font-family: "Lato", sans-serif;
+}
+
+.main-menu {
+    padding: 15px 0;
+    width: 100%;
+    height: max-content;
+    background-color: white;
+}
+
+.header-banner {
+    position: relative;
+    text-align: center;
+}
+
+.overlay-container {
+    position: absolute;
+    top: 50%;
+    width: 100%;
+    background-color: rgba(0, 0, 0, 0.64);
+}
+
+section {
+    text-align: center;
+    padding: 20px;
+}
+
+section > * {
+    margin-bottom: 10px;
+}
+
+.project, .photos {
+    max-width: 80%;
+    margin: 10px auto;
+}
+
+.project:nth-child(odd) {
+    background-color: whitesmoke;
+}
+
+.project:nth-child(even) {
+    background-color: lightgray;
+}
+
+.video-container {
+    position: relative;
+    max-width: 100%;
+    padding-bottom: 30%;
+}
+
+.video {
+    position: absolute;
+    top: 0;
+    left: 0;
+}
