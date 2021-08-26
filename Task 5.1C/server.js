@@ -9,8 +9,9 @@ const app = express()
 const bcrypt = require('bcrypt');
 const { ifError } = require("assert");
 const saltRounds = 10
+var port = process.env.PORT || 5000
 
-mongoose.connect('mongodb://localhost:27017/iServiceDB', {useNewUrlParser: true})
+mongoose.connect('mongodb+srv://xkdo:LbXB85XJw3iAYb3z@cluster0.5vkos.mongodb.net/myFirstDatabase?retryWrites=true&w=majority', {useNewUrlParser: true})
 
 const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'Connection error:'));
@@ -21,8 +22,6 @@ db.once('open', function() {
 app.use(express.static(__dirname + "/public", {
     index: false,
 }))
-
-let password = '';
 
 const userSchema = new mongoose.Schema({
     country: {
@@ -59,20 +58,8 @@ const userSchema = new mongoose.Schema({
         trim: true,
         required: [true, 'This field is required!'],
         validate: (value) => {
-            password = value;
-
             if(!validator.isStrongPassword(value)) {
                 throw new Error('Password is weak! Make sure it is at least 8 characters and contains: 1 upper, 1 lower, 1 number, 1 symbol.')
-            }
-        }
-    },
-    confirmpassword: {
-        type: String,
-        trim: true,
-        required: [true, 'This field is required!'],
-        validate: (value) => {
-            if(!validator.equals(value, password)) {
-                throw new Error('Passwords do not match!')
             }
         }
     },
@@ -118,6 +105,14 @@ const userSchema = new mongoose.Schema({
     }
 });
 
+userSchema.virtual('confirmpassword')
+    .get(function() {
+    return this._confirmpassword;
+    })
+    .set(function(value) {
+        this._confirmpassword = value;
+    });
+
 userSchema.pre('save', function(next) {
     let user = this;
 
@@ -133,6 +128,18 @@ userSchema.pre('save', function(next) {
         });
     });
 })
+
+userSchema.pre('validate', function(next) {
+    if (this.confirmpassword === "") {
+        this.invalidate('confirmpassword', 'This field is required!')
+    }
+    else {
+        if (this.password !== this.confirmpassword) {
+            this.invalidate('confirmpassword', 'Passwords do not match')
+        }
+    }
+    next();
+});
 
 userSchema.methods.comparePassword = function(plaintextPassword, callback) {
     bcrypt.compare(plaintextPassword, this.password, function(err, isMatch) {
@@ -169,15 +176,21 @@ app.post('/', (req, res) => {
             res.send(message)
         }
         else {
-            user.comparePassword(data.password, function(err, isMatch) {
-                if(!isMatch) {
-                    res.status(400)
-                    res.send(message)
-                }
-                else {
-                    res.sendStatus(200)
-                }
-            })
+            if(user != null) {
+                user.comparePassword(data.password, function(err, isMatch) {
+                    if(!isMatch) {
+                        res.status(400)
+                        res.send(message)
+                    }
+                    else {
+                        res.sendStatus(200)
+                    }
+                })
+            }
+            else {
+                res.status(400)
+                res.send(message)
+            }
         }
     })
 })
@@ -185,10 +198,14 @@ app.post('/', (req, res) => {
 app.post('/custsignup.html', (req, res) => {
     const user = new User(req.body)
 
+    user.passwordConfirmation = req.body.confirmpassword
+
     user.save(function(err) {
         if(err) {
             let data = {}
             let errors = err.errors
+
+            console.log(errors.confirmpassword)
 
             for(const [key, value] of Object.entries(errors)) {
                 data[key] = value.message
@@ -237,6 +254,6 @@ app.post('/custsignup.html', (req, res) => {
     })
 })
 
-app.listen(3000, function (request, response){
-    console.log("Server is running on port 3000")
+app.listen(port, function (request, response){
+    console.log("Server is running on port " + port.toString())
 })
