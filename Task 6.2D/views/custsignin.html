@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <title>iService</title>
+    
+    <!-- Bootstrap core CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
+
+    <!-- Custom styles for this template -->
+    <link href="/css/main.css" rel="stylesheet">
+  </head>
+  <body class="text-center">
+    <main class="form-container">
+      <h1 class="fw-normal">iService Login</h1>
+
+      <form id='form' novalidate>
+        <h3 class="mb-3 fw-normal">Login with your iService Account</h3>
+
+        <div class="form-floating mb-3">
+          <input type="email" class="form-control" id="email" placeholder="name@example.com" required>
+          <label for="email">Email address*</label>
+        </div>
+
+        <div class="form-floating mb-3">
+          <input type="password" class="form-control" id="password" placeholder="Password" required>
+          <label for="password">Password*</label>
+          <div class="invalid-feedback"></div>
+        </div>
+
+        <div class="form-check d-inline-block mb-3">
+          <input class="form-check-input" type="checkbox" value="" id="rememberMe">
+          <label class="form-check-label" for="rememberMe">Remember me</label>
+        </div>
+
+        <div class="row g-2 mb-3">
+          <div class="col-md" style>
+            <button class="w-100 btn btn-lg btn-primary" type="submit" form="form">Sign in</button>
+          </div>
+          <div class="col-md">
+            <button class="w-100 btn btn-lg btn-outline-primary" type="button" onclick="location.href='/custsignup.html'">Sign up</button>
+          </div>
+        </div>
+      </form>
+
+      <a href="/custforgot.html" class="d-block link-primary mb-3">Forgot password?</a>
+
+      <hr class="mt-4 mb-4"/>
+      <button class="w-100 btn btn-lg btn-danger mb-2" onclick="window.location.href='/auth/google'"><i class="bi bi-google"></i> Sign in with Google</button>
+
+      <p class="mt-4 mb-3 text-muted">&copy; 2021 iService</p>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-U1DAWAznBHeqEIlVSCgzq+c9gqGAJn5c/t99JyeKa9xxaYpSvHU5awsuZVVFIhvj" crossorigin="anonymous"></script>
+    <script>
+      const form = document.getElementById('form');
+
+      form.addEventListener('submit', (event) => {
+        event.preventDefault();
+
+        let fields = form.elements;
+        let data = {};
+        
+        for(let i = 0; i < 3; i++) {
+          data[fields[i].id] = i != 2 ? fields[i].value : fields[i].checked;
+        }
+
+        const xhttp = new XMLHttpRequest();
+        const message = document.getElementsByClassName('invalid-feedback')[0];
+
+        xhttp.onreadystatechange = function() {
+          for(let i = 0; i < 2; i++) {
+            fields[i].classList.remove('is-invalid');
+          }
+
+          if (this.readyState == 4) {
+            if (this.status == 400) {
+              let json = JSON.parse(this.response)
+              message.textContent = json['message'];
+              for(let i = 0; i < 2; i++) {
+                fields[i].classList.add('is-invalid');
+              }
+            }
+            if (this.status == 200) {
+              alert('Sign in succesfully!');
+              window.location.replace('/custtask.html');
+            }
+          }
+        };
+
+        xhttp.open("POST", "/");
+        xhttp.setRequestHeader("Content-type", "application/json", true);
+        xhttp.send(JSON.stringify(data));
+      })
+    </script>
+  </body>
+</html>
