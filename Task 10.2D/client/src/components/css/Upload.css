@@ -1,0 +1,38 @@
+.image-preview-container {
+    display: flex;
+    flex: 0 1 auto !important;
+    overflow-x: scroll;
+    overflow-y: visible
+}
+
+.image-segment:only-child,
+.image-segment:first-child:nth-last-child(2) ~ .image-segment {
+    border-right: 1px solid rgba(34,36,38,.15) !important
+}
+
+.image-segment {
+    flex: 0 1 auto !important;
+    flex-shrink: 0 !important;
+}
+
+.image-preview > img {
+    width: auto !important;
+    height: 300px !important;
+    max-width: none !important;
+}
+
+.image-segment > div > .ui.progress {
+    margin: 0px !important
+}
+
+.progress-bar {
+    z-index: 102;
+}
+
+.image-label-group {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
